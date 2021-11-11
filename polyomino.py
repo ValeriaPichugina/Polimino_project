@@ -43,14 +43,14 @@ background_colour = (234, 212, 252)
 screen = pygame.display.set_mode((2000,1000))
 
 
-pygame.display.set_caption('neegga')
+pygame.display.set_caption('dis')
 screen.fill(background_colour)
-#n*m размеронсть поля
-n=5
-m=7
+#n*m размерность поля
+n = 5
+m = 7
 error = False
 rt = False
-gr =[ [0]*n for _ in range(m) ]
+gr = [ [0]*n for _ in range(m) ]
 
 print(gr)
 
@@ -78,6 +78,7 @@ x2 = Figures(height,margin,[[1],
                             [1],
                             [1]])
 x3 = Figures(height,margin,[[0,1,0],[1,1,1]])
+x4 = Figures(height,margin,[[1,1,0],[0,1,1]])
 
 figs_sprites = pygame.sprite.Group()
 #добавление
@@ -99,7 +100,7 @@ while running:
                         curr_fig = fig
 
             elif event.type == pygame.MOUSEBUTTONUP:
-                print("ывфывфывфы")
+                print("nope")
                 moving = False
                 tst = curr_fig.rect.topleft
                 print(tst)
