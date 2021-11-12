@@ -24,17 +24,17 @@ class Figures(pygame.sprite.Sprite):
         self.image.set_alpha(150)
         self.rect = self.image.get_rect()
         self.rect.topleft = (100+margin+55,100+margin)
-        self.id = random.randint(1,1000000000000000000000)
+        self.id = random.randint(1,1000000)
 
 
 def decoord(h,m,coord):
-    return round((coord-m-100-1)/(h+m))
+    return round((coord-m-100)/(h+m))
 
 def cell_found(h,m,coord):
-    return [decoord(h,m,i)-1 for i in coord]
+    return [decoord(h,m,i) for i in coord]
 
 def right_coord(n,m,coord):
-    return all([0<=coord[0]<n and 0<=coord[1]<=m])
+    return all([0<=coord[0]<=m and 0<=coord[1]<=n])
 
 def cell_coord(h,m,cell):
     return [((h + m)*i + m + 100) for i in cell]
@@ -43,11 +43,11 @@ background_colour = (234, 212, 252)
 screen = pygame.display.set_mode((2000,1000))
 
 
-pygame.display.set_caption('Geeksforgeeks')
+pygame.display.set_caption('dis')
 screen.fill(background_colour)
-
-n=2
-m=4
+#n*m размерность поля
+n=5
+m=7
 error = False
 rt = False
 gr =[ [0]*n for _ in range(m) ]
@@ -74,11 +74,17 @@ figs = [testRect1,testRect2]
 #pygame.draw.rect(screen,(255,255,255),pygame.Rect(98,98,500,500),3)
 #pygame.display.flip()
 x1 = Figures(height,margin,[[1,1]])
-x2 = Figures(height,margin,[[1],[1],[1]])
-x2 = Figures(height,margin,[[0,1,0],[1,1,1]])
+x2 = Figures(height,margin,[[1],
+                            [1],
+                            [1]])
+x3 = Figures(height,margin,[[0,1,0],[1,1,1]])
+x4 = Figures(height,margin,[[1,1,0],[0,1,1]])
+x5 = Figures(height,margin,[1])
+x6 = Figures(height,margin,[[1,1],[1,1]])
 
 figs_sprites = pygame.sprite.Group()
-figs_sprites.add(x1,x2)
+#добавление
+figs_sprites.add(x1,x2,x3)
 
 while running:
         for event in pygame.event.get():
@@ -92,53 +98,33 @@ while running:
                     if fig.rect.collidepoint(event.pos):
                         moving = True
                         mouse_x, mouse_y = event.pos
-                        mouse_event = tuple(i * (-1) for i in event.pos)
-                        offset = tuple(map(operator.add, fig.rect.topleft, mouse_event))
+                        offset = tuple(np.array(fig.rect.topleft) - np.array(event.pos))
                         curr_fig = fig
 
             elif event.type == pygame.MOUSEBUTTONUP:
-                print("ывфывфывфы")
                 moving = False
-                tst = curr_fig.rect.topleft
-                print(tst)
-                a=(round((tst[0]-margin-100)/(height+margin)),
-                        round((tst[1] - margin - 100) / (height + margin)))
-                print(a)
 
-                tst2 = curr_fig.rect.bottomright
-                c = (round((tst2[0] - margin - 100) / (height + margin)) - 1,
-                     round((tst2[1] - margin - 100) / (height + margin)) - 1)
-                print(c)
-                b = (
-                        (height+margin)*a[0]+margin+100,
-                    (height+margin)*a[1]+margin+100
-                         )
-                curr_fig.rect.topleft=b
-                if 0<=a[1]<n and 0<=a[0]<m :
+                cr_fig_topleft = curr_fig.rect.topleft
+                curr_topleft= cell_found(height,margin,cr_fig_topleft)
 
-                    # b =(
-                    #     (height+margin)*a[0]+margin+100,
-                    #     (height+margin)*a[1]+margin+100
-                    #     )
-                    # curr_fig.rect.topleft=b
+                aproximated_topleft = cell_coord(height,margin,curr_topleft)
+                curr_fig.rect.topleft=aproximated_topleft
 
-                    tst = curr_fig.rect.topleft
-                    print(tst)
-                    a = (round((tst[0] - margin - 100) / (height + margin)),
-                         round((tst[1] - margin - 100) / (height + margin)))
-                    print(a)
+                if right_coord(n,m,curr_topleft):
 
-                    tst2 = curr_fig.rect.bottomright
-                    c = (round((tst2[0] - margin - 100) / (height + margin))-1,
-                         round((tst2[1] - margin - 100) / (height + margin))-1)
-                    print(c)
-                    if 0<=c[1]<n and 0<=c[0]<m:
-                        arrrrrr = [(i,j) for i in range(a[0],c[0]+1) for j in range(a[1],c[1]+1)]
+                    cr_fig_botright = curr_fig.rect.bottomright
+                    curr_botright = np.array(cell_found(height, margin, np.array(cr_fig_botright)- 0.5*margin))-1
+                    print(curr_botright)
 
-                        for ind in arrrrrr:
-                            ssss = np.array(ind) - np.array(a)
-                            if curr_fig.arr[ssss[1]][ssss[0]] == 1:
-                                gr[ind[0]][ind[1]] = curr_fig.id
+                    if right_coord(n,m,curr_botright):
+                        curr_topleft = cell_found(height,margin,aproximated_topleft)
+                        print(curr_botright, curr_topleft)
+                        arrrrrr = [(i,j) for i in range(curr_topleft[0],curr_botright[0]+1) for j in range(curr_topleft[1],curr_botright[1]+1)]
+
+                        #for ind in arrrrrr:
+                        #    ssss = np.array(ind) - np.array(a)
+                        #    if curr_fig.arr[ssss[1]][ssss[0]] == 1:
+                        #        gr[ind[0]][ind[1]] = curr_fig.id
 
 
                         print(gr)
@@ -158,7 +144,8 @@ while running:
 
             elif event.type == pygame.MOUSEMOTION and moving:
                 mouse_x, mouse_y = event.pos
-                curr_fig.rect.topleft = tuple(map(operator.add, event.pos, offset))
+                #curr_fig.rect.topleft = tuple(map(operator.add, event.pos, offset))
+                curr_fig.rect.topleft = tuple(np.array(event.pos)+ np.array(offset))
 
             screen.fill(background_colour)
 
