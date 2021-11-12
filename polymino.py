@@ -43,7 +43,7 @@ background_colour = (234, 212, 252)
 screen = pygame.display.set_mode((2000,1000))
 
 
-pygame.display.set_caption('dis')
+pygame.display.set_caption('polyomino')
 screen.fill(background_colour)
 #n*m размерность поля
 n=5
@@ -80,10 +80,11 @@ x2 = Figures(height,margin,[[1],
 x3 = Figures(height,margin,[[0,1,0],[1,1,1]])
 x4 = Figures(height,margin,[[1,1,0],[0,1,1]])
 x5 = Figures(height,margin,[[1,1],[1,1]])
+x6 = Figures(height,margin,[[1]])
 
 figs_sprites = pygame.sprite.Group()
 #добавление
-figs_sprites.add(x1,x2,x3,x4,x5)
+figs_sprites.add(x1,x2,x3,x4,x5,x6)
 
 while running:
         for event in pygame.event.get():
