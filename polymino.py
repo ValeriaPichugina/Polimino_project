@@ -83,7 +83,7 @@ x5 = Figures(height,margin,[[1,1],[1,1]])
 
 figs_sprites = pygame.sprite.Group()
 #добавление
-figs_sprites.add(x1,x2,x3)
+figs_sprites.add(x1,x2,x3,x4,x5)
 
 while running:
         for event in pygame.event.get():
