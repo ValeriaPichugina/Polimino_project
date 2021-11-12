@@ -79,8 +79,7 @@ x2 = Figures(height,margin,[[1],
                             [1]])
 x3 = Figures(height,margin,[[0,1,0],[1,1,1]])
 x4 = Figures(height,margin,[[1,1,0],[0,1,1]])
-x5 = Figures(height,margin,[1])
-x6 = Figures(height,margin,[[1,1],[1,1]])
+x5 = Figures(height,margin,[[1,1],[1,1]])
 
 figs_sprites = pygame.sprite.Group()
 #добавление
