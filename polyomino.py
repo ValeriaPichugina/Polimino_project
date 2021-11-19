@@ -23,39 +23,129 @@ class Figures(pygame.sprite.Sprite):
         self.image.fill((self.r,self.g,self.b))
         self.image.set_alpha(150)
         self.rect = self.image.get_rect()
-        self.rect.topleft = (100+margin+55,100+margin)
+        self.rect.topleft = (1000,100)
         self.id = random.randint(1,1000000)
 
 
 def decoord(h,m,coord):
-    return round((coord-m-100-1)/(h+m))
+    return round((coord-m-100)/(h+m))
 
 def cell_found(h,m,coord):
-    return [decoord(h,m,i)-1 for i in coord]
+    return [decoord(h,m,i) for i in coord]
 
 def right_coord(n,m,coord):
-    return all([0<=coord[0]<n and 0<=coord[1]<=m])
+    return all([0<=coord[0]<=m and 0<=coord[1]<=n])
 
 def cell_coord(h,m,cell):
     return [((h + m)*i + m + 100) for i in cell]
+
+def placeQ(grid, points):
+    for pt in points:
+        if grid[pt[0]][pt[1]] != 0:
+            return False
+    return True
+
+def place(grid,points,id):
+    for pt in points:
+        grid[pt[0]][pt[1]] = id
+    return grid
+
+def remove(grid,id):
+    for i in range(n):
+        for j in range(m):
+            if grid[i][j] == id:
+                grid[i][j] = 0
+    return grid
+
+def status(grid):
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if grid[i][j] == 0:
+                return False
+    return True
+
+def right_crd(n, m, coords):
+    for i in coords:
+        if 0 <= i[0] < n and 0 <= i[1] < m:
+            pass
+        else:
+            return False
+    return True
+
+
+def gener(n,m,toAdd = []):
+    grid =[ [0]*m  for _ in range(n) ]
+    main_base = [
+        [[1]],[[1,1]],[[1,1,1]],[[1,1,1,1]],
+        [[1],[1]],[[1],[1],[1]],[[1],[1],[1],[1]],
+        [[1,1],[0,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]]
+    ]
+    base = main_base+toAdd
+    all_points = [[i,j] for i in range(n) for j in range(m)]
+    print(all_points)
+    figs = []
+    ir=0
+
+
+
+    while not status(grid):
+        print("-----------------------------------------------")
+        tmp_fig = random.choice(base)
+        print("chosen figure")
+        print(tmp_fig)
+        place_points = []
+        tmp = all_points[0]
+        print("center")
+        print(tmp)
+        filled_pts = [np.array(tmp) + np.array([i, j]) for i in range(len(tmp_fig)) for j in range(len(tmp_fig[0]))]
+        print("points recta")
+        print(filled_pts)
+        for ind in filled_pts:
+            abs_pnt = np.array(ind) - np.array(tmp)
+            # print(absolute_point)
+            #print("ind")
+            #print(ind)
+            if tmp_fig[abs_pnt[0]][abs_pnt[1]] == 1:
+                place_points.append(list(ind))
+
+        print("meanful points recta")
+        print(place_points)
+        if right_crd(n,m,place_points):
+            print("zashel")
+            if placeQ(grid,place_points):
+                grid = place(grid,place_points,1)
+
+                    #all_points = [i for i in all_points if i not in place_points]
+                for i in place_points:
+                    all_points.remove(list(i))
+
+                print("all centres after placa")
+                print(all_points)
+                figs.append(tmp_fig)
+
+    print("field")
+    print(grid)
+    print(figs)
+    return figs
+
 pygame.init()
 background_colour = (234, 212, 252)
-screen = pygame.display.set_mode((2000,1000))
+screen = pygame.display.set_mode((1500,800))
 
 
-pygame.display.set_caption('dis')
+pygame.display.set_caption('polyomino')
 screen.fill(background_colour)
-#n*m размерность поля
-n = 5
-m = 7
+#n*m размеронсть поля
+n=4
+m=7
 error = False
 rt = False
-gr = [ [0]*n for _ in range(m) ]
+gr =[ [0]*m for _ in range(n) ]
 
 print(gr)
 
-height=800/max(n,m)
-margin=height/50
+height=round(800/max(n,m))
+margin=round(height/50)
 print(margin+100)
 print(height)
 #margin = 1
@@ -75,14 +165,18 @@ figs = [testRect1,testRect2]
 #pygame.display.flip()
 x1 = Figures(height,margin,[[1,1]])
 x2 = Figures(height,margin,[[1],
-                            [1],
+                           [1],
                             [1]])
 x3 = Figures(height,margin,[[0,1,0],[1,1,1]])
-x4 = Figures(height,margin,[[1,1,0],[0,1,1]])
 
 figs_sprites = pygame.sprite.Group()
 #добавление
-figs_sprites.add(x1,x2,x3)
+#figs_sprites.add(x1,x2,x3)
+#gen = generate(n,m)
+#figs_sprites.add(*[Figures(height,margin,i) for i in gen])
+fgs = gener(n,m)
+print(fgs)
+figs_sprites.add(*[Figures(height,margin,i) for i in fgs])
 
 while running:
         for event in pygame.event.get():
@@ -98,50 +192,46 @@ while running:
                         mouse_x, mouse_y = event.pos
                         offset = tuple(np.array(fig.rect.topleft) - np.array(event.pos))
                         curr_fig = fig
+                        print("Ты держишь фигуру")
+                        print(curr_fig.arr)
 
             elif event.type == pygame.MOUSEBUTTONUP:
-                print("nope")
                 moving = False
-                tst = curr_fig.rect.topleft
-                print(tst)
-                a=(round((tst[0]-margin-100)/(height+margin)),
-                        round((tst[1] - margin - 100) / (height + margin)))
-                print(a)
 
-                tst2 = curr_fig.rect.bottomright
-                c = (round((tst2[0] - margin - 100) / (height + margin)) - 1,
-                     round((tst2[1] - margin - 100) / (height + margin)) - 1)
-                print(c)
-                b = (
-                        (height+margin)*a[0]+margin+100,
-                    (height+margin)*a[1]+margin+100
-                         )
-                curr_fig.rect.topleft=b
-                if 0<=a[1]<n and 0<=a[0]<m :
+                cr_fig_topleft = curr_fig.rect.topleft
+                curr_topleft= cell_found(height,margin,cr_fig_topleft)
 
-                    # b =(
-                    #     (height+margin)*a[0]+margin+100,
-                    #     (height+margin)*a[1]+margin+100
-                    #     )
-                    # curr_fig.rect.topleft=b
+                aproximated_topleft = cell_coord(height,margin,curr_topleft)
+                curr_fig.rect.topleft=aproximated_topleft
 
-                    tst = curr_fig.rect.topleft
-                    print(tst)
-                    a = (round((tst[0] - margin - 100) / (height + margin)),
-                         round((tst[1] - margin - 100) / (height + margin)))
-                    print(a)
+                if right_coord(n,m,curr_topleft):
 
-                    tst2 = curr_fig.rect.bottomright
-                    c = (round((tst2[0] - margin - 100) / (height + margin))-1,
-                         round((tst2[1] - margin - 100) / (height + margin))-1)
-                    print(c)
-                    if 0<=c[1]<n and 0<=c[0]<m:
-                        arrrrrr = [(i,j) for i in range(a[0],c[0]+1) for j in range(a[1],c[1]+1)]
+                    cr_fig_botright = curr_fig.rect.bottomright
+                    curr_botright = np.array(cell_found(height, margin, np.array(cr_fig_botright)- 0.5*margin))-1
+                    #print(curr_botright)
 
-                        for ind in arrrrrr:
-                            ssss = np.array(ind) - np.array(a)
-                            if curr_fig.arr[ssss[1]][ssss[0]] == 1:
-                                gr[ind[0]][ind[1]] = curr_fig.id
+                    if right_coord(n,m,curr_botright):
+                        curr_topleft = cell_found(height,margin,aproximated_topleft)
+                        #print(curr_botright, curr_topleft)
+                        filled_points = [(j,i) for i in range(curr_topleft[0],curr_botright[0]+1) for j in range(curr_topleft[1],curr_botright[1]+1)]
+                        #print("-------------------------")
+                        #print(filled_points)
+                        #print(curr_topleft)
+                        #print(type(curr_topleft))
+                        #print("-------------------------")
+                        place_points = []
+                        tmp = [curr_topleft[1],curr_topleft[0]]
+                        for ind in filled_points:
+                            absolute_point = np.array(ind) - np.array(tmp)
+                            #print(absolute_point)
+                            #print(ind)
+                            if curr_fig.arr[absolute_point[0]][absolute_point[1]] == 1:
+                                place_points.append(ind)
+
+                        if placeQ(gr,place_points):
+                            gr = remove(gr,curr_fig.id)
+                            gr = place(gr,place_points,curr_fig.id)
+                        #        gr[ind[0]][ind[1]] = curr_fig.id
 
 
                         print(gr)
@@ -163,6 +253,11 @@ while running:
                 mouse_x, mouse_y = event.pos
                 #curr_fig.rect.topleft = tuple(map(operator.add, event.pos, offset))
                 curr_fig.rect.topleft = tuple(np.array(event.pos)+ np.array(offset))
+
+
+            elif event.type == pygame.KEYUP:
+                if status(gr):
+                    running=False
 
             screen.fill(background_colour)
 
