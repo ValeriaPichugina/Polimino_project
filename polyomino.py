@@ -1,5 +1,4 @@
 import pygame
-import operator
 import random
 import numpy as np
 
@@ -9,19 +8,17 @@ class Figures(pygame.sprite.Sprite):
         self.size = h
         self.margin = mar
         self.arr = coords
-        self.image = pygame.Surface(
-            (
-             self.size * (len(self.arr[0])) + self.margin*(len(self.arr[0])-1),
-             self.size * (len(self.arr))    + self.margin * (len(self.arr)-1)
-
-            )
-        )
+        self.png_id = "".join([str(j) for i in self.arr for j in i])
+        self.image = pygame.image.load(f"figures_pictures\\{self.png_id}.png")
+        self.image = pygame.transform.scale(self.image,
+                                            (self.size * (len(self.arr[0])) + self.margin * (len(self.arr[0]) - 1),
+                                             self.size * (len(self.arr)) + self.margin * (len(self.arr) - 1)))
         #pygame.Surface.set_alpha(self.image, 100)
         self.r = random.randint(0,255)
         self.g = random.randint(0,255)
         self.b = random.randint(0,255)
-        self.image.fill((self.r,self.g,self.b))
-        self.image.set_alpha(150)
+        #self.image.fill((self.r,self.g,self.b))
+        #self.image.set_alpha(150)
         self.rect = self.image.get_rect()
         self.rect.topleft = (1000,100)
         self.id = random.randint(1,1000000)
@@ -60,7 +57,7 @@ def remove(grid,id):
 def status(grid):
     for i in range(len(grid)):
         for j in range(len(grid[0])):
-            if grid[i][j] == 0:
+            if grid[i][j] ==0:
                 return False
     return True
 
@@ -76,21 +73,10 @@ def right_crd(n, m, coords):
 def gener(n,m,toAdd = []):
     grid =[ [0]*m  for _ in range(n) ]
     main_base = [
-        [[1]],
-        [[1,1]],
-        [[1,1,1]],
-        [[1,1,1,1]],
-        [[1],[1]],
-        [[1],[1],[1]],
-        [[1],[1],[1],[1]],
-        [[1,1],[0,1]],
-        [[1,1],[1,0]],
-        [[1,0],[1,1]],
-        [[0,1],[1,1]],
-        [[0,1,0],[1,1,1]],
-        [[1,0,0],[1,1,1]],
-        [[1,1,0],[0,1,1]],
-        [[0,1,1],[1,1,0]]
+        [[1]],[[1,1],[0,1]],
+        [[1,1]],[[1,1,1]],[[1,1,1,1]],
+        #[[1],[1]],[[1],[1],[1]],[[1],[1],[1],[1]],
+        [[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]]
     ]
     base = main_base+toAdd
     all_points = [[i,j] for i in range(n) for j in range(m)]
@@ -103,14 +89,14 @@ def gener(n,m,toAdd = []):
     while not status(grid):
         print("-----------------------------------------------")
         tmp_fig = random.choice(base)
-        print("chosen figure")
+        print("vibrannaya figura")
         print(tmp_fig)
         place_points = []
         tmp = all_points[0]
         print("center")
         print(tmp)
         filled_pts = [np.array(tmp) + np.array([i, j]) for i in range(len(tmp_fig)) for j in range(len(tmp_fig[0]))]
-        print("points recta")
+        print("tochki recta")
         print(filled_pts)
         for ind in filled_pts:
             abs_pnt = np.array(ind) - np.array(tmp)
@@ -120,7 +106,7 @@ def gener(n,m,toAdd = []):
             if tmp_fig[abs_pnt[0]][abs_pnt[1]] == 1:
                 place_points.append(list(ind))
 
-        print("meanful points recta")
+        print("znachimie tochki recta")
         print(place_points)
         if right_crd(n,m,place_points):
             print("zashel")
@@ -131,32 +117,32 @@ def gener(n,m,toAdd = []):
                 for i in place_points:
                     all_points.remove(list(i))
 
-                print("all centres after placa")
+                print("vse centri posle placa")
                 print(all_points)
                 figs.append(tmp_fig)
 
-    print("field")
+    print("pole")
     print(grid)
     print(figs)
     return figs
 
 pygame.init()
 background_colour = (234, 212, 252)
-screen = pygame.display.set_mode((1500,800))
+screen = pygame.display.set_mode((1300,800))
 
 
 pygame.display.set_caption('polyomino')
 screen.fill(background_colour)
 #n*m размеронсть поля
-n=4
-m=7
+n=5
+m=5
 error = False
 rt = False
 gr =[ [0]*m for _ in range(n) ]
 
 print(gr)
 
-height=round(800/max(n,m))
+height=round(500/max(n,m))
 margin=round(height/50)
 print(margin+100)
 print(height)
@@ -175,12 +161,12 @@ figs = [testRect1,testRect2]
 #pygame.draw.rect(screen, (1,1,1), pygame.Rect.union_ip(testRect1,testRect2),1)
 #pygame.draw.rect(screen,(255,255,255),pygame.Rect(98,98,500,500),3)
 #pygame.display.flip()
-x1 = Figures(height,margin,[[1,1]])
-x2 = Figures(height,margin,[[1],
-                           [1],
-                            [1]])
-x3 = Figures(height,margin,[[0,1,0],[1,1,1]])
-
+#x1 = Figures(height,margin,[[1,1]])
+#x2 = Figures(height,margin,[[1],
+  #                         [1],
+ #                           [1]])
+#x3 = Figures(height,margin,[[0,1,0],[1,1,1]])
+#print(x1.rect)
 figs_sprites = pygame.sprite.Group()
 #добавление
 #figs_sprites.add(x1,x2,x3)
