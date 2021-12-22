@@ -10,8 +10,8 @@ class Figures(pygame.sprite.Sprite):
         self.margin = mar
         self.arr = coords
         self.png_id = "".join([str(j) for i in self.arr for j in i])
-        print(f"/Users/valeriapicugina/PycharmProjects/Polimino_project/figures_pictures/{self.png_id}{len(coords)}{len(coords[0])}{random.randint(1, 4)}.png")
-        self.image = pygame.image.load(f"/Users/valeriapicugina/PycharmProjects/Polimino_project/figures_pictures/{self.png_id}{len(coords)}{len(coords[0])}{random.randint(1, 4)}.png")
+        print(f"figures_pictures/{self.png_id}{len(coords)}{len(coords[0])}{random.randint(1, 4)}.png")
+        self.image = pygame.image.load(f"figures_pictures/{self.png_id}{len(coords)}{len(coords[0])}{random.randint(1, 4)}.png")
         self.image = pygame.transform.scale(self.image,
                                             (self.size * (len(self.arr[0])) + self.margin * (len(self.arr[0]) - 1),
                                              self.size * (len(self.arr)) + self.margin * (len(self.arr) - 1)))
