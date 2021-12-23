@@ -1,5 +1,4 @@
 import tkinter
-
 import pygame
 import operator
 import random
@@ -7,8 +6,6 @@ import numpy as np
 import easygui as eg
 from  tkinter import messagebox
 import tkinter as tk
-#png_path = eg.fileopenbox()
-#print(png_path)
 
 class Figures(pygame.sprite.Sprite):
     def __init__(self,h,mar,coords):
@@ -22,12 +19,9 @@ class Figures(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image,
                                             (self.size * (len(self.arr[0])) + self.margin * (len(self.arr[0]) - 1),
                                              self.size * (len(self.arr)) + self.margin * (len(self.arr) - 1)))
-        #pygame.Surface.set_alpha(self.image, 100)
         self.r = random.randint(0,255)
         self.g = random.randint(0,255)
         self.b = random.randint(0,255)
-        #self.image.fill((self.r,self.g,self.b))
-        #self.image.set_alpha(150)
         self.rect = self.image.get_rect()
         self.rect.topleft = (1000,100)
         self.id = random.randint(1,1000000)
@@ -133,9 +127,6 @@ def gener(n,m,toAdd = []):
         print(filled_pts)
         for ind in filled_pts:
             abs_pnt = np.array(ind) - np.array(tmp)
-            # print(absolute_point)
-            #print("ind")
-            #print(ind)
             if tmp_fig[abs_pnt[0]][abs_pnt[1]] == 1:
                 place_points.append(list(ind))
 
@@ -146,7 +137,6 @@ def gener(n,m,toAdd = []):
             if placeQ(grid,place_points):
                 grid = place(grid,place_points,1)
 
-                    #all_points = [i for i in all_points if i not in place_points]
                 for i in place_points:
                     all_points.remove(list(i))
 
@@ -187,23 +177,10 @@ testRect2 = pygame.Rect(70,70,height,height)
 test = pygame.Rect(300,800,height,height)
 nw = pygame.Rect.union(testRect2,test)
 figs = [testRect1,testRect2]
-#pygame.draw.rect(screen, (1,1,1), testRect1)
-#pygame.draw.rect(screen, (1,1,1), testRect2,  2)
-#pygame.draw.rect(screen, (1,1,1), testRect3,  2)
-#pygame.draw.rect(screen, (1,1,1), pygame.Rect.union_ip(testRect1,testRect2),1)
-#pygame.draw.rect(screen,(255,255,255),pygame.Rect(98,98,500,500),3)
-#pygame.display.flip()
-#x1 = Figures(height,margin,[[1,1]])
-#x2 = Figures(height,margin,[[1],
-  #                         [1],
- #                           [1]])
-#x3 = Figures(height,margin,[[0,1,0],[1,1,1]])
-#print(x1.rect)
+
 figs_sprites = pygame.sprite.Group()
+
 #добавление
-#figs_sprites.add(x1,x2,x3)
-#gen = generate(n,m)
-#figs_sprites.add(*[Figures(height,margin,i) for i in gen])
 fgs = gener(n, m)
 print(fgs)
 figs_sprites.add(*[Figures(height, margin, i) for i in fgs])
@@ -246,50 +223,32 @@ while running:
 
                     cr_fig_botright = curr_fig.rect.bottomright
                     curr_botright = np.array(cell_found(height, margin, np.array(cr_fig_botright)- 0.5*margin))-1
-                    #print(curr_botright)
 
                     if right_coord(n,m,curr_botright):
                         curr_topleft = cell_found(height,margin,aproximated_topleft)
-                        #print(curr_botright, curr_topleft)
+
                         filled_points = [(j,i) for i in range(curr_topleft[0],curr_botright[0]+1) for j in range(curr_topleft[1],curr_botright[1]+1)]
-                        #print("-------------------------")
-                        #print(filled_points)
-                        #print(curr_topleft)
-                        #print(type(curr_topleft))
-                        #print("-------------------------")
+
                         place_points = []
                         tmp = [curr_topleft[1],curr_topleft[0]]
                         for ind in filled_points:
                             absolute_point = np.array(ind) - np.array(tmp)
-                            #print(absolute_point)
-                            #print(ind)
+
                             if curr_fig.arr[absolute_point[0]][absolute_point[1]] == 1:
                                 place_points.append(ind)
 
                         if placeQ(gr,place_points):
                             gr = remove(gr,curr_fig.id)
                             gr = place(gr,place_points,curr_fig.id)
-                        #        gr[ind[0]][ind[1]] = curr_fig.id
 
 
                         print(gr)
 
 
 
-                #print(cell_coord(height,m,tst))
-
-                # #if curr_fig.collidepoint(event.pos):
-                # coord = testRect1.center
-                # a = cell_found(height, margin, coord)
-                # print(a)
-                # if right_coord(n,m,a):
-                #     testRect1 = pygame.Rect(*cell_coord(height,margin,a), height,height)
-                # else:
-                #     print("chmo")
 
             elif event.type == pygame.MOUSEMOTION and moving:
                 mouse_x, mouse_y = event.pos
-                #curr_fig.rect.topleft = tuple(map(operator.add, event.pos, offset))
                 curr_fig.rect.topleft = tuple(np.array(event.pos)+ np.array(offset))
 
 
@@ -298,10 +257,6 @@ while running:
                     running=False
 
             screen.fill(background_colour)
-
-        #pygame.draw.rect(screen, (2,0,255), testRect2)
-        #pygame.draw.rect(screen, (2,0,55), test)
-        #pygame.draw.rect(screen, (2,0,55), nw)
 
 
 
@@ -315,11 +270,10 @@ while running:
                                   height,
                                   height])
 
-        #pygame.draw.rect(screen, (255, 0, 255), testRect1)
-        #pygame.draw.rect(screen, (255, 0, 255), testRect2)
+
         for fig in figs_sprites:
             screen.blit(fig.image, fig.rect)
-    #pygame.draw.polygon(screen,(255,5,5),[[0,0],[0,100],[100,0],[100,100]])
+
         pygame.display.update()
 
 pygame.quit()
