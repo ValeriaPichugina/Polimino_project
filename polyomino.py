@@ -1,7 +1,14 @@
+import tkinter
+
 import pygame
+import operator
 import random
 import numpy as np
-
+import easygui as eg
+from  tkinter import messagebox
+import tkinter as tk
+#png_path = eg.fileopenbox()
+#print(png_path)
 
 class Figures(pygame.sprite.Sprite):
     def __init__(self,h,mar,coords):
@@ -202,63 +209,75 @@ print(fgs)
 figs_sprites.add(*[Figures(height, margin, i) for i in fgs])
 
 while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    if status(gr):
+                        root = tk.Tk()
+                        root.withdraw()
+                        answer = messagebox.askyesno("Поздравляю с победой", "Выйти из игры?")
+                        if answer:
+                            pygame.quit()
 
 
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                for fig in figs_sprites:
+                    if fig.rect.collidepoint(event.pos):
+                        moving = True
+                        mouse_x, mouse_y = event.pos
+                        offset = tuple(np.array(fig.rect.topleft) - np.array(event.pos))
+                        curr_fig = fig
+                        print("Ты держишь фигуру")
+                        print(curr_fig.arr)
 
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            for fig in figs_sprites:
-                if fig.rect.collidepoint(event.pos):
-                    moving = True
-                    mouse_x, mouse_y = event.pos
-                    offset = tuple(np.array(fig.rect.topleft) - np.array(event.pos))
-                    curr_fig = fig
-                    print("Ты держишь фигуру")
-                    print(curr_fig.arr)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                moving = False
 
-        elif event.type == pygame.MOUSEBUTTONUP:
-            moving = False
+                cr_fig_topleft = curr_fig.rect.topleft
+                curr_topleft= cell_found(height,margin,cr_fig_topleft)
 
-            cr_fig_topleft = curr_fig.rect.topleft
-            curr_topleft= cell_found(height,margin,cr_fig_topleft)
+                aproximated_topleft = cell_coord(height,margin,curr_topleft)
+                curr_fig.rect.topleft=aproximated_topleft
 
-            aproximated_topleft = cell_coord(height,margin,curr_topleft)
-            curr_fig.rect.topleft=aproximated_topleft
+                if right_coord(n,m,curr_topleft):
 
-            if right_coord(n,m,curr_topleft):
+                    cr_fig_botright = curr_fig.rect.bottomright
+                    curr_botright = np.array(cell_found(height, margin, np.array(cr_fig_botright)- 0.5*margin))-1
+                    #print(curr_botright)
 
-                cr_fig_botright = curr_fig.rect.bottomright
-                curr_botright = np.array(cell_found(height, margin, np.array(cr_fig_botright)- 0.5*margin))-1
-                #print(curr_botright)
+                    if right_coord(n,m,curr_botright):
+                        curr_topleft = cell_found(height,margin,aproximated_topleft)
+                        #print(curr_botright, curr_topleft)
+                        filled_points = [(j,i) for i in range(curr_topleft[0],curr_botright[0]+1) for j in range(curr_topleft[1],curr_botright[1]+1)]
+                        #print("-------------------------")
+                        #print(filled_points)
+                        #print(curr_topleft)
+                        #print(type(curr_topleft))
+                        #print("-------------------------")
+                        place_points = []
+                        tmp = [curr_topleft[1],curr_topleft[0]]
+                        for ind in filled_points:
+                            absolute_point = np.array(ind) - np.array(tmp)
+                            #print(absolute_point)
+                            #print(ind)
+                            if curr_fig.arr[absolute_point[0]][absolute_point[1]] == 1:
+                                place_points.append(ind)
 
-                if right_coord(n,m,curr_botright):
-                    curr_topleft = cell_found(height,margin,aproximated_topleft)
-                    #print(curr_botright, curr_topleft)
-                    filled_points = [(j,i) for i in range(curr_topleft[0],curr_botright[0]+1) for j in range(curr_topleft[1],curr_botright[1]+1)]
-                    #print("-------------------------")
-                    #print(filled_points)
-                    #print(curr_topleft)
-                    #print(type(curr_topleft))
-                    #print("-------------------------")
-                    place_points = []
-                    tmp = [curr_topleft[1],curr_topleft[0]]
-                    for ind in filled_points:
-                        absolute_point = np.array(ind) - np.array(tmp)
-                        #print(absolute_point)
-                        #print(ind)
-                        if curr_fig.arr[absolute_point[0]][absolute_point[1]] == 1:
-                            place_points.append(ind)
-
-                    if placeQ(gr,place_points):
-                        gr = remove(gr,curr_fig.id)
-                        gr = place(gr,place_points,curr_fig.id)
+                        if placeQ(gr,place_points):
+                            gr = remove(gr,curr_fig.id)
+                            gr = place(gr,place_points,curr_fig.id)
                         #        gr[ind[0]][ind[1]] = curr_fig.id
 
-                    print(gr)
+
+                        print(gr)
+
+
 
                 #print(cell_coord(height,m,tst))
+
                 # #if curr_fig.collidepoint(event.pos):
                 # coord = testRect1.center
                 # a = cell_found(height, margin, coord)
@@ -268,16 +287,17 @@ while running:
                 # else:
                 #     print("chmo")
 
-        elif event.type == pygame.MOUSEMOTION and moving:
-            mouse_x, mouse_y = event.pos
-            #curr_fig.rect.topleft = tuple(map(operator.add, event.pos, offset))
-            curr_fig.rect.topleft = tuple(np.array(event.pos)+ np.array(offset))
+            elif event.type == pygame.MOUSEMOTION and moving:
+                mouse_x, mouse_y = event.pos
+                #curr_fig.rect.topleft = tuple(map(operator.add, event.pos, offset))
+                curr_fig.rect.topleft = tuple(np.array(event.pos)+ np.array(offset))
 
-        elif event.type == pygame.KEYUP:
-            if status(gr):
-                running=False
 
-        screen.fill(background_colour)
+            elif event.type == pygame.KEYUP:
+                if status(gr):
+                    running=False
+
+            screen.fill(background_colour)
 
         #pygame.draw.rect(screen, (2,0,255), testRect2)
         #pygame.draw.rect(screen, (2,0,55), test)
@@ -285,21 +305,21 @@ while running:
 
 
 
-    for row in range(n):
-        for column in range(m):
-            color = (255,255,255)
-            pygame.draw.rect(screen,
-                                color,
-                                [(height + margin) * column + margin + 100,
-                                (height + margin) * row + margin + 100,
-                                height,
-                                height])
+        for row in range(n):
+            for column in range(m):
+                color = (255,255,255)
+                pygame.draw.rect(screen,
+                                 color,
+                                 [(height + margin) * column + margin + 100,
+                                  (height + margin) * row + margin + 100,
+                                  height,
+                                  height])
 
         #pygame.draw.rect(screen, (255, 0, 255), testRect1)
         #pygame.draw.rect(screen, (255, 0, 255), testRect2)
-    for fig in figs_sprites:
-        screen.blit(fig.image, fig.rect)
+        for fig in figs_sprites:
+            screen.blit(fig.image, fig.rect)
     #pygame.draw.polygon(screen,(255,5,5),[[0,0],[0,100],[100,0],[100,100]])
-    pygame.display.update()
+        pygame.display.update()
 
 pygame.quit()
