@@ -4,8 +4,10 @@ import operator
 import random
 import numpy as np
 import easygui as eg
-from  tkinter import messagebox
+from tkinter import messagebox
 import tkinter as tk
+import sys
+
 
 class Figures(pygame.sprite.Sprite):
     def __init__(self,h,mar,coords):
@@ -56,7 +58,7 @@ def place(grid,points,id):
     return grid
 
 
-def remove(grid,id):
+def remove(grid, id, n, m):
     for i in range(n):
         for j in range(m):
             if grid[i][j] == id:
@@ -149,43 +151,43 @@ def gener(n,m,toAdd = []):
     print(figs)
     return figs
 
-pygame.init()
-background_colour = (0, 0, 0)
-screen = pygame.display.set_mode((1300,800))
 
-pygame.display.set_caption('polyomino')
-screen.fill(background_colour)
-#n*m размеронсть поля
-n=5
-m=5
-error = False
-rt = False
-gr =[ [0]*m for _ in range(n) ]
+def game(n, m):
+    # n*m размеронсть поля
+    pygame.init()
+    background_colour = (0, 0, 0)
+    screen = pygame.display.set_mode((1500,800))
 
-print(gr)
+    pygame.display.set_caption('polyomino')
+    screen.fill(background_colour)
+    error = False
+    rt = False
+    gr =[ [0]*m for _ in range(n) ]
 
-height=round(500/max(n,m))
-margin=round(height/50)
-print(margin+100)
-print(height)
-#margin = 1
-running = True
-moving = False
+    print(gr)
 
-testRect1 = pygame.Rect(30,30,height,height)
-testRect2 = pygame.Rect(70,70,height,height)
-test = pygame.Rect(300,800,height,height)
-nw = pygame.Rect.union(testRect2,test)
-figs = [testRect1,testRect2]
+    height=round(500/max(n,m))
+    margin=round(height/50)
+    print(margin+100)
+    print(height)
+    #margin = 1
+    running = True
+    moving = False
 
-figs_sprites = pygame.sprite.Group()
+    testRect1 = pygame.Rect(30,30,height,height)
+    testRect2 = pygame.Rect(70,70,height,height)
+    test = pygame.Rect(300,800,height,height)
+    nw = pygame.Rect.union(testRect2,test)
+    figs = [testRect1,testRect2]
 
-#добавление
-fgs = gener(n, m)
-print(fgs)
-figs_sprites.add(*[Figures(height, margin, i) for i in fgs])
+    figs_sprites = pygame.sprite.Group()
 
-while running:
+    #добавление
+    fgs = gener(n, m)
+    print(fgs)
+    figs_sprites.add(*[Figures(height, margin, i) for i in fgs])
+
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -198,7 +200,6 @@ while running:
                         answer = messagebox.askyesno("Поздравляем с победой!", "Выйти из игры?")
                         if answer:
                             pygame.quit()
-
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for fig in figs_sprites:
@@ -235,22 +236,17 @@ while running:
                             absolute_point = np.array(ind) - np.array(tmp)
 
                             if curr_fig.arr[absolute_point[0]][absolute_point[1]] == 1:
-                                place_points.append(ind)
+                                    place_points.append(ind)
 
                         if placeQ(gr,place_points):
-                            gr = remove(gr,curr_fig.id)
+                            gr = remove(gr,curr_fig.id, n, m)
                             gr = place(gr,place_points,curr_fig.id)
-
 
                         print(gr)
 
-
-
-
             elif event.type == pygame.MOUSEMOTION and moving:
-                mouse_x, mouse_y = event.pos
-                curr_fig.rect.topleft = tuple(np.array(event.pos)+ np.array(offset))
-
+                    mouse_x, mouse_y = event.pos
+                    curr_fig.rect.topleft = tuple(np.array(event.pos)+ np.array(offset))
 
             elif event.type == pygame.KEYUP:
                 if status(gr):
@@ -258,22 +254,19 @@ while running:
 
             screen.fill(background_colour)
 
-
-
         for row in range(n):
             for column in range(m):
                 color = (255,255,255)
                 pygame.draw.rect(screen,
-                                 color,
-                                 [(height + margin) * column + margin + 100,
-                                  (height + margin) * row + margin + 100,
-                                  height,
-                                  height])
-
+                                color,
+                                [(height + margin) * column + margin + 100,
+                                (height + margin) * row + margin + 100,
+                                height,
+                                height])
 
         for fig in figs_sprites:
             screen.blit(fig.image, fig.rect)
 
         pygame.display.update()
 
-pygame.quit()
+    pygame.quit()
