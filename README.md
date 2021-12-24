@@ -6,10 +6,20 @@
 ## Правила игры в полимино:
 Задача игрока состоит в том, чтобы на поле определённой размерности (заданной самим пользователем) поставить изначально сгенерированный набор фигур так, чтобы заполнить все клетки поля (составить из фигур прямоугольник/квадрат).
 
-![Иллюстрация к проекту](https://github.com/ValeriaPichugina/Polimino_project/blob/main/440px-Pentominos_square_8x8_016.svg.png)
+![Иллюстрация к проекту](https://github.com/ValeriaPichugina/Polyomino_project/blob/main/start_window.png)
+![Иллюстрация к проекту](https://github.com/ValeriaPichugina/Polyomino_project/blob/main/play_window.png)
+![Иллюстрация к проекту](https://github.com/ValeriaPichugina/Polyomino_project/blob/main/result_window.png)
 
 ## Задачи проекта:
  1) Создание интерфейса через pygame
  2) Создание фигур
  3) Разработка функций для работы 
  4) Разработка возможности для пользователя перетаскивать и ставить фигуры на рабочей поверхности
+
+## Использованные библиотеки и модули:
+1) tkinter
+2) pygame
+3) numpy
+4) random
+5) easygui
+6) sys
