@@ -197,7 +197,7 @@ def game(n, m):
                     if status(gr):
                         root = tk.Tk()
                         root.withdraw()
-                        answer = messagebox.askyesno("Поздравляем с победой!", "Выйти из игры?")
+                        answer = messagebox.askyesno("Ура, Вы победили!", "Выйти из игры?")
                         if answer:
                             pygame.quit()
 
